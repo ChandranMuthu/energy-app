@@ -95,6 +95,7 @@ public class MQTTConfiguration {
 //        mqttClient.connect(mqttConnectOptions());
 //        return mqttClient;
 //    }
+    //
 
     @Bean
     public DataSource dataSource() throws SQLException {

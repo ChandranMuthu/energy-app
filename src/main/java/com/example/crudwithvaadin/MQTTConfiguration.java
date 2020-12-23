@@ -94,7 +94,7 @@ public class MQTTConfiguration {
 //        IMqttClient mqttClient = new MqttClient("tcp://" + hostname + ":" + port, clientId);
 //        mqttClient.connect(mqttConnectOptions());
 //        return mqttClient;
-//    }//
+//    }
 
     @Bean
     public DataSource dataSource() throws SQLException {

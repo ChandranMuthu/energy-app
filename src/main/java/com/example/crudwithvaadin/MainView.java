@@ -2,10 +2,13 @@ package com.example.crudwithvaadin;
 
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.charts.Chart;
 import com.vaadin.flow.component.charts.model.*;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -38,6 +41,10 @@ public class MainView extends VerticalLayout {
 
 	final TextField filter;
 
+	List<EnergyOutput> energyOutputList;
+
+	Chart chart = new Chart();
+
 	//private final Button addNewBtn;
 
 	public MainView(EnergyOutputRepository repo) {
@@ -45,41 +52,54 @@ public class MainView extends VerticalLayout {
 //		this.editor = editor;
 		this.grid = new Grid<>(EnergyOutput.class);
 		this.filter = new TextField();
+
+		this.energyOutputList = repo.findAll();
+		final List<String> distinctDeviceId = repo.getDistinctDeviceId();
+
+
 		//this.addNewBtn = new Button("New customer", VaadinIcon.PLUS.create());
 
 		// build layout
 		HorizontalLayout actions = new HorizontalLayout(filter);
 
-		MenuBar menuBar = new MenuBar();
-		Text selected = new Text("");
-		Div message = new Div(new Text("Selected: "), selected);
-
-		MenuItem project = menuBar.addItem("Home");
-		MenuItem account = menuBar.addItem("Account");
-		menuBar.addItem("Sign Out", e -> selected.setText("Sign Out"));
-
-		SubMenu projectSubMenu = project.getSubMenu();
-		MenuItem users = projectSubMenu.addItem("Users");
-		MenuItem billing = projectSubMenu.addItem("Billing");
-
-		SubMenu usersSubMenu = users.getSubMenu();
-		usersSubMenu.addItem("List", e -> selected.setText("List"));
-		usersSubMenu.addItem("Add", e -> selected.setText("Add"));
-
-		SubMenu billingSubMenu = billing.getSubMenu();
-		billingSubMenu.addItem("Invoices", e -> selected.setText("Invoices"));
-		billingSubMenu.addItem("Balance Events",
-				e -> selected.setText("Balance Events"));
-
-		account.getSubMenu().addItem("Edit Profile",
-				e -> selected.setText("Edit Profile"));
-		account.getSubMenu().addItem("Privacy Settings",
-				e -> selected.setText("Privacy Settings"));
-		add(menuBar, message);
+		setupMenuBar();
 
 
-		drawGraph(repo.findAll());
+		FormLayout nameLayout = new FormLayout();
 
+		ComboBox<String> deviceIdComboBox = new ComboBox<>();
+		deviceIdComboBox.setItems(distinctDeviceId);
+		deviceIdComboBox.setLabel("DeviceId");
+		deviceIdComboBox.setPlaceholder("DeviceId");
+
+		Button save = new Button("Search");
+		save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+		save.addClickListener(event -> {
+			searchButtonListener(repo, deviceIdComboBox.getValue());
+		});
+
+
+		Button reset = new Button("Reset");
+		reset.addClickListener(event -> {
+			energyOutputList = repo.findAll();
+			grid.setItems(energyOutputList);
+			drawGraph(energyOutputList);
+			chart.drawChart(true);
+		});
+
+
+		nameLayout.add(deviceIdComboBox, save, reset);
+
+		nameLayout.setResponsiveSteps(
+				new FormLayout.ResponsiveStep("25em", 1),
+				new FormLayout.ResponsiveStep("32em", 2),
+				new FormLayout.ResponsiveStep("40em", 3));
+		add(nameLayout);
+
+
+
+		drawGraph(energyOutputList);
+		add(chart);
 
 		add(actions, grid);
 
@@ -113,28 +133,57 @@ public class MainView extends VerticalLayout {
 		listCustomers(null);
 	}
 
+	private void searchButtonListener(EnergyOutputRepository repo, String value) {
+		energyOutputList = repo.findByDeviceId(value);
+		grid.setItems(energyOutputList);
+		drawGraph(energyOutputList);
+		chart.drawChart(true);
+	}
+
+	private void setupMenuBar() {
+		MenuBar menuBar = new MenuBar();
+		Text selected = new Text("");
+		Div message = new Div(new Text("Selected: "), selected);
+
+		MenuItem project = menuBar.addItem("Home");
+		MenuItem account = menuBar.addItem("Account");
+		menuBar.addItem("Sign Out", e -> selected.setText("Sign Out"));
+
+		SubMenu projectSubMenu = project.getSubMenu();
+		MenuItem users = projectSubMenu.addItem("Users");
+		MenuItem billing = projectSubMenu.addItem("Billing");
+
+		SubMenu usersSubMenu = users.getSubMenu();
+		usersSubMenu.addItem("List", e -> selected.setText("List"));
+		usersSubMenu.addItem("Add", e -> selected.setText("Add"));
+
+		SubMenu billingSubMenu = billing.getSubMenu();
+		billingSubMenu.addItem("Invoices", e -> selected.setText("Invoices"));
+		billingSubMenu.addItem("Balance Events",
+				e -> selected.setText("Balance Events"));
+
+		account.getSubMenu().addItem("Edit Profile",
+				e -> selected.setText("Edit Profile"));
+		account.getSubMenu().addItem("Privacy Settings",
+				e -> selected.setText("Privacy Settings"));
+		add(menuBar, message);
+	}
+
 	private void drawGraph(final List<EnergyOutput> energyOutputList) {
-		Chart chart = new Chart();
 
 		Configuration configuration = chart.getConfiguration();
 		configuration.setTitle("Monthly Average Reading");
 		configuration.setSubTitle("Source: Some Device");
 		chart.getConfiguration().getChart().setType(ChartType.COLUMN);
 
-		//List<Map<String, Integer>> graphData = new ArrayList<>();
-
 		final Map<String, List<EnergyOutput>> collect = energyOutputList.stream().collect(groupingBy(EnergyOutput::getDeviceId));
 		final Set<LocalDateTime> localDateTimes = energyOutputList.stream().filter(distinctByKey(p -> p.getDeviceDateTime())).map(EnergyOutput::getDeviceDateTime).collect(Collectors.toSet());
-
 		final String[] xAxisData = localDateTimes.stream().map(e-> e.toLocalDate().toString()).toArray(n -> new String[n]);
-
-
-
-
+		List<Series> tempSeries = new ArrayList<>();
 		collect.forEach((k, v) -> {
-			configuration.addSeries(new ListSeries(k, v.stream().map(energyOutput -> energyOutput.getCalculatedValue().intValue()).collect(Collectors.toSet())));
+			tempSeries.add(new ListSeries(k, v.stream().map(energyOutput -> energyOutput.getCalculatedValue().intValue()).collect(Collectors.toSet())));
 		});
-
+		chart.getConfiguration().setSeries(tempSeries);
 
 //		energyOutputList.forEach(energyOutput -> {
 //			configuration.addSeries(new ListSeries(energyOutput.getDeviceId(), energyOutput.getCalculatedValue()));
@@ -145,22 +194,24 @@ public class MainView extends VerticalLayout {
 //		configuration.addSeries(new ListSeries("Device 3", 48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2));
 //		configuration.addSeries(new ListSeries("Device 4", 42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1));
 
+		configuration.removexAxes();
 		XAxis x = new XAxis();
 		x.setCrosshair(new Crosshair());
 		//x.setCategories("Jan","Feb","March", "April", "May", "June", "July","Aug", "Sep", "oct", "Nov", "Dec");
 		x.setCategories(xAxisData);
 		configuration.addxAxis(x);
 
+		configuration.removeyAxes();
 		YAxis y = new YAxis();
 		y.setMin(0);
 		y.setTitle("Voltage used (volt)");
 		configuration.addyAxis(y);
 
+
+
 		Tooltip tooltip = new Tooltip();
 		tooltip.setShared(true);
 		configuration.setTooltip(tooltip);
-
-		add(chart);
 	}
 
 	// tag::listCustomers[]

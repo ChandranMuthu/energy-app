@@ -59,6 +59,7 @@ public class MqttMessageHandler implements MessageHandler {
                 if (data.size() > 0) {
                     energyOutput.setInputReading(StringUtils.join(data));
                 }
+
                 System.out.println(energyOutput.toString());
                 energyOutputRepository.save(energyOutput);
             }

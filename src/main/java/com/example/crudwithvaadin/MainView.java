@@ -18,6 +18,15 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+
 @Route
 public class MainView extends VerticalLayout {
 
@@ -69,34 +78,7 @@ public class MainView extends VerticalLayout {
 		add(menuBar, message);
 
 
-		Chart chart = new Chart();
-
-		Configuration configuration = chart.getConfiguration();
-		configuration.setTitle("Monthly Average Reading");
-		configuration.setSubTitle("Source: Some Device");
-		chart.getConfiguration().getChart().setType(ChartType.COLUMN);
-
-		configuration.addSeries(new ListSeries("Device 1", 49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4));
-		configuration.addSeries(new ListSeries("Device 2", 83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3));
-		configuration.addSeries(new ListSeries("Device 3", 48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2));
-		configuration.addSeries(new ListSeries("Device 4", 42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1));
-
-		XAxis x = new XAxis();
-		x.setCrosshair(new Crosshair());
-		x.setCategories("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug",
-				"Sep", "Oct", "Nov", "Dec");
-		configuration.addxAxis(x);
-
-		YAxis y = new YAxis();
-		y.setMin(0);
-		y.setTitle("Voltage used (volt)");
-		configuration.addyAxis(y);
-
-		Tooltip tooltip = new Tooltip();
-		tooltip.setShared(true);
-		configuration.setTooltip(tooltip);
-
-		add(chart);
+		drawGraph(repo.findAll());
 
 
 		add(actions, grid);
@@ -131,6 +113,56 @@ public class MainView extends VerticalLayout {
 		listCustomers(null);
 	}
 
+	private void drawGraph(final List<EnergyOutput> energyOutputList) {
+		Chart chart = new Chart();
+
+		Configuration configuration = chart.getConfiguration();
+		configuration.setTitle("Monthly Average Reading");
+		configuration.setSubTitle("Source: Some Device");
+		chart.getConfiguration().getChart().setType(ChartType.COLUMN);
+
+		//List<Map<String, Integer>> graphData = new ArrayList<>();
+
+		final Map<String, List<EnergyOutput>> collect = energyOutputList.stream().collect(groupingBy(EnergyOutput::getDeviceId));
+		final Set<LocalDateTime> localDateTimes = energyOutputList.stream().filter(distinctByKey(p -> p.getDeviceDateTime())).map(EnergyOutput::getDeviceDateTime).collect(Collectors.toSet());
+
+		final String[] xAxisData = localDateTimes.stream().map(e-> e.toLocalDate().toString()).toArray(n -> new String[n]);
+
+
+
+
+		collect.forEach((k, v) -> {
+			configuration.addSeries(new ListSeries(k, v.stream().map(energyOutput -> energyOutput.getCalculatedValue().intValue()).collect(Collectors.toSet())));
+		});
+
+
+//		energyOutputList.forEach(energyOutput -> {
+//			configuration.addSeries(new ListSeries(energyOutput.getDeviceId(), energyOutput.getCalculatedValue()));
+//		});
+
+//		configuration.addSeries(new ListSeries("Device 1", 49.9, 71.5, 106.4, 129.2, 144.0, 176.0, 135.6, 148.5, 216.4, 194.1, 95.6, 54.4));
+//		configuration.addSeries(new ListSeries("Device 2", 83.6, 78.8, 98.5, 93.4, 106.0, 84.5, 105.0, 104.3, 91.2, 83.5, 106.6, 92.3));
+//		configuration.addSeries(new ListSeries("Device 3", 48.9, 38.8, 39.3, 41.4, 47.0, 48.3, 59.0, 59.6, 52.4, 65.2, 59.3, 51.2));
+//		configuration.addSeries(new ListSeries("Device 4", 42.4, 33.2, 34.5, 39.7, 52.6, 75.5, 57.4, 60.4, 47.6, 39.1, 46.8, 51.1));
+
+		XAxis x = new XAxis();
+		x.setCrosshair(new Crosshair());
+		//x.setCategories("Jan","Feb","March", "April", "May", "June", "July","Aug", "Sep", "oct", "Nov", "Dec");
+		x.setCategories(xAxisData);
+		configuration.addxAxis(x);
+
+		YAxis y = new YAxis();
+		y.setMin(0);
+		y.setTitle("Voltage used (volt)");
+		configuration.addyAxis(y);
+
+		Tooltip tooltip = new Tooltip();
+		tooltip.setShared(true);
+		configuration.setTooltip(tooltip);
+
+		add(chart);
+	}
+
 	// tag::listCustomers[]
 	void listCustomers(String filterText) {
 		if (StringUtils.isEmpty(filterText)) {
@@ -141,5 +173,11 @@ public class MainView extends VerticalLayout {
 		}
 	}
 	// end::listCustomers[]
+
+	public static <T> Predicate<T> distinctByKey(Function<? super T, Object> keyExtractor)
+	{
+		Map<Object, Boolean> map = new ConcurrentHashMap<>();
+		return t -> map.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
+	}
 
 }

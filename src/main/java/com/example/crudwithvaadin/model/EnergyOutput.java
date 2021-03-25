@@ -1,4 +1,4 @@
-package com.example.crudwithvaadin;
+package com.example.crudwithvaadin.model;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.hibernate.annotations.GenericGenerator;

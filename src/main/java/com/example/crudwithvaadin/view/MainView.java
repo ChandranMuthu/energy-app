@@ -1,5 +1,7 @@
-package com.example.crudwithvaadin;
+package com.example.crudwithvaadin.view;
 
+import com.example.crudwithvaadin.model.EnergyOutput;
+import com.example.crudwithvaadin.repository.EnergyOutputRepository;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -11,14 +13,12 @@ import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.spring.annotation.UIScope;
 import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;

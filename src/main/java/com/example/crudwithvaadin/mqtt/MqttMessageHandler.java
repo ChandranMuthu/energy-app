@@ -1,5 +1,7 @@
-package com.example.crudwithvaadin;
+package com.example.crudwithvaadin.mqtt;
 
+import com.example.crudwithvaadin.model.EnergyOutput;
+import com.example.crudwithvaadin.repository.EnergyOutputRepository;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;

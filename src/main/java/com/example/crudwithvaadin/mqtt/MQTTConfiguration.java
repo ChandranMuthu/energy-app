@@ -1,5 +1,6 @@
-package com.example.crudwithvaadin;
+package com.example.crudwithvaadin.mqtt;
 
+import com.example.crudwithvaadin.repository.EnergyOutputRepository;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import org.eclipse.paho.client.mqttv3.MqttConnectOptions;
@@ -14,10 +15,8 @@ import org.springframework.integration.core.MessageProducer;
 import org.springframework.integration.mqtt.core.DefaultMqttPahoClientFactory;
 import org.springframework.integration.mqtt.inbound.MqttPahoMessageDrivenChannelAdapter;
 import org.springframework.integration.mqtt.support.DefaultPahoMessageConverter;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.MessageChannel;
 import org.springframework.messaging.MessageHandler;
-import org.springframework.messaging.MessagingException;
 
 import javax.sql.DataSource;
 import java.sql.SQLException;

@@ -21,10 +21,13 @@ import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.ServiceException;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@Route("Signup")
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
+
+@Route("new-user")
 @PageTitle("Energy App - Sign up")
 public class SignupView extends VerticalLayout {
     private PasswordField passwordField1;
@@ -40,18 +43,40 @@ public class SignupView extends VerticalLayout {
     public SignupView(@Autowired UserService userService) {
         this.userService = userService;
         H2 title = new H2("Signup form");
-
+        Span errorMessage = new Span();
         TextField firstName = new TextField("First name");
+        firstName.setRequired(true);
+        firstName.setRequiredIndicatorVisible(true);
+        firstName.setErrorMessage("First name cannot be empty");
+
+
         TextField lastName = new TextField("Last name");
+        lastName.setRequired(true);
+        lastName.setRequiredIndicatorVisible(true);
+        lastName.setErrorMessage("Last name cannot be empty");
+
         TextField handleField = new TextField("Username");
+        handleField.setRequired(true);
+        handleField.setRequiredIndicatorVisible(true);
+        handleField.setErrorMessage("Username cannot be empty");
+
         EmailField emailField = new EmailField("Email");
+        emailField.setRequiredIndicatorVisible(true);
+        emailField.setErrorMessage("Username cannot be empty");
+
+
         emailField.setVisible(true);
         passwordField1 = new PasswordField("Enter password");
         passwordField2 = new PasswordField("Confirm Password");
-        Span errorMessage = new Span();
+
+
+
+
 
         Button submitButton = new Button("Submit");
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        //submitButton.setEnabled(false);
+
         FormLayout formLayout = new FormLayout(title, firstName, lastName, handleField, passwordField1, passwordField2,
                 emailField, errorMessage, submitButton);
 
@@ -76,60 +101,95 @@ public class SignupView extends VerticalLayout {
         // Add the form to the page
         add(formLayout);
 
-        binder = new BeanValidationBinder<User>(User.class);
 
-        // Basic name fields that are required to fill in
-        binder.forField(firstName).asRequired().bind("firstname");
-        binder.forField(lastName).asRequired().bind("lastname");
 
-        // The handle has a custom validator, in addition to being required. Some values
-        // are not allowed, such as 'admin'; this is checked in the validator.
-        binder.forField(handleField).withValidator(this::validateHandle).asRequired().bind("handle");
 
-        binder.forField(emailField).asRequired(new VisibilityEmailValidator("Value is not a valid email address")).bind("email");
 
-        // Another custom validator, this time for passwords
-        binder.forField(passwordField1).asRequired().withValidator(this::passwordValidator).bind("password");
-        // We won't bind passwordField2 to the Binder, because it will have the same
-        // value as the first field when correctly filled in. We just use it for
-        // validation.
 
-        // The second field is not connected to the Binder, but we want the binder to
-        // re-check the password validator when the field value changes. The easiest way
-        // is just to do that manually.
-        passwordField2.addValueChangeListener(e -> {
 
-            // The user has modified the second field, now we can validate and show errors.
-            // See passwordValidator() for how this flag is used.
-            enablePasswordValidation = true;
-
-            binder.validate();
-        });
-
-        // A label where bean-level error messages go
-        binder.setStatusLabel(errorMessage);
+//        binder = new BeanValidationBinder<User>(User.class);
+//
+//        // Basic name fields that are required to fill in
+//        binder.forField(firstName).asRequired().bind("firstname");
+//        binder.forField(lastName).asRequired().bind("lastname");
+//
+//        // The handle has a custom validator, in addition to being required. Some values
+//        // are not allowed, such as 'admin'; this is checked in the validator.
+//        binder.forField(handleField).withValidator(this::validateHandle).asRequired().bind("handle");
+//
+//        binder.forField(emailField).asRequired(new VisibilityEmailValidator("Value is not a valid email address")).bind("email");
+//
+//        // Another custom validator, this time for passwords
+//        binder.forField(passwordField1).asRequired().withValidator(this::passwordValidator).bind("password");
+//        // We won't bind passwordField2 to the Binder, because it will have the same
+//        // value as the first field when correctly filled in. We just use it for
+//        // validation.
+//
+//        // The second field is not connected to the Binder, but we want the binder to
+//        // re-check the password validator when the field value changes. The easiest way
+//        // is just to do that manually.
+//        passwordField2.addValueChangeListener(e -> {
+//
+//            // The user has modified the second field, now we can validate and show errors.
+//            // See passwordValidator() for how this flag is used.
+//            enablePasswordValidation = true;
+//
+//            binder.validate();
+//        });
+//
+//        // A label where bean-level error messages go
+//        binder.setStatusLabel(errorMessage);
 
 
         submitButton.addClickListener(e -> {
             try {
                 //TODO need to add validation here as the Binder validation is not working.
+                String message = new String();
+                if(isEmpty(firstName.getValue()))
+                {
+                   message = message + "First name" + ", ";
+                }
+                if(isEmpty(lastName.getValue()))
+                {
+                    message = message + "Last name" + ", ";
+                }
+                if(isEmpty(handleField.getValue()))
+                {
+                    message = message + "Username" + ", ";
+                }
+                if(isEmpty(passwordField1.getValue()) || isEmpty(passwordField2.getValue()))
+                {
+                    message = message + "Password" + ", ";
+                }
+                if(isEmpty(emailField.getValue()))
+                {
+                    message = message + "Email id";
+                }
+                if(StringUtils.isNotEmpty(message))
+                {
+                    errorMessage.setText(
+                            "Please enter the following details : " + message);
+                    return;
+                }
+                if(!passwordField1.getValue().equals(passwordField2.getValue()))
+                {
+                    errorMessage.getElement().setProperty("innerHtml","Password did not match");
 
+                    return;
+                }
+                if(userService.checkIfUserNameAlreadyExist(handleField.getValue()))
+                {
+                    errorMessage.setText("Username with id " + handleField.getValue() + " already exist. Please enter a different username");
+                    return;
+                }
                 // Create empty bean to store the details into
-                User user = new User(firstName.getValue(), lastName.getValue(), handleField.getValue(), passwordField2.getValue(), emailField.getValue(), Role.USER);
-
-                // Run validators and write the values to the bean
-                binder.writeBean(user);
-
-                // Call backend to store the data
-                userService.saveUser(user);
-                // Show success message if everything went well
-                showSuccess(user);
-
-            } catch (ValidationException e1) {
-                // validation errors are already visible for each field,
-                // and bean-level errors are shown in the status label.
-
-                // We could show additional messages here if we want, do logging, etc.
+                if(isEmpty(message)) {
+                    User user = new User(firstName.getValue(), lastName.getValue(), handleField.getValue(), passwordField2.getValue(), emailField.getValue(), Role.USER);
+                    // Call backend to store the data
+                    userService.saveUser(user);
+                    // Show success message if everything went well
+                    showSuccess(user);
+                }
 
             } catch (Exception e2) {
 

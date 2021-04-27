@@ -21,21 +21,21 @@ public class User {
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
     @NotNull
-    private final String firstName;
+    private  String firstName;
     @NotNull
-    private final String lastName;
+    private  String lastName;
     @NotNull
-    private final String userName;
+    private  String userName;
     @NotNull
-    private final String password;
+    private  String password;
     @NotNull
-    private final String emailId;
+    private  String emailId;
     @NotNull
-    private final Role role;
+    private  Role role;
     private LocalDateTime createdAt;
 
-
-
+    public User() {
+    }
 
     public User(String firstName, String lastName, String userName, String password, String emailId, Role role) {
         this.firstName = firstName;

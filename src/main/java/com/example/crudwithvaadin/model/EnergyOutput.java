@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import static org.apache.commons.lang3.builder.ToStringStyle.JSON_STYLE;
 
 @Entity
-@Table(name = "energy_output", schema = "energy_app")
+@Table(name = "EnergyOutput")
 public class EnergyOutput implements Serializable {
     private static final long serialVersionUID = 5686845785686592876L;
 

@@ -61,6 +61,7 @@ public class CrudWithVaadinApplication {
             userRepository.deleteAll();
             User user = new User("Admin", "admin", "admin", "admin1234", "admin@gmail.com", Role.ADMIN);
             userService.saveUser(user);
+            log.info("default admin user loaded");
         };
     }
 }

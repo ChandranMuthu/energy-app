@@ -1,7 +1,7 @@
 package com.example.crudwithvaadin.view;
 
 import com.example.crudwithvaadin.model.Role;
-import com.example.crudwithvaadin.model.User;
+import com.example.crudwithvaadin.model.UserDetails;
 import com.example.crudwithvaadin.service.UserService;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -15,7 +15,6 @@ import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.BeanValidationBinder;
-import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.data.binder.ValidationResult;
 import com.vaadin.flow.data.binder.ValueContext;
 import com.vaadin.flow.data.validator.EmailValidator;
@@ -33,7 +32,7 @@ public class SignupView extends VerticalLayout {
     private PasswordField passwordField1;
     private PasswordField passwordField2;
     private UserService userService;
-    private BeanValidationBinder<User> binder;
+    private BeanValidationBinder<UserDetails> binder;
 
     /**
      * Flag for disabling first run for password validation
@@ -179,11 +178,11 @@ public class SignupView extends VerticalLayout {
                 }
                 // Create empty bean to store the details into
                 if(isEmpty(message)) {
-                    User user = new User(firstName.getValue(), lastName.getValue(), handleField.getValue(), passwordField2.getValue(), emailField.getValue(), Role.USER);
+                    UserDetails userDetails = new UserDetails(firstName.getValue(), lastName.getValue(), handleField.getValue(), passwordField2.getValue(), emailField.getValue(), Role.USER);
                     // Call backend to store the data
-                    userService.saveUser(user);
+                    userService.saveUser(userDetails);
                     // Show success message if everything went well
-                    showSuccess(user);
+                    showSuccess(userDetails);
                 }
 
             } catch (Exception e2) {
@@ -201,8 +200,8 @@ public class SignupView extends VerticalLayout {
 
     }
 
-    private void showSuccess(User user) {
-        Notification notification = Notification.show("Data saved, welcome " + user.getUserName());
+    private void showSuccess(UserDetails userDetails) {
+        Notification notification = Notification.show("Data saved, welcome " + userDetails.getUserName());
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
     }
 

@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "user_details", schema = "energy_app")
-public class User implements Serializable {
+public class UserDetails implements Serializable {
 
     private static final long serialVersionUID = 4686845785686592896L;
 
@@ -38,10 +38,10 @@ public class User implements Serializable {
     private LocalDateTime createdAt;
 
 
-    public User() {
+    public UserDetails() {
     }
 
-    public User(String firstName, String lastName, String userName, String password, String emailId, Role role) {
+    public UserDetails(String firstName, String lastName, String userName, String password, String emailId, Role role) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.userName = userName;

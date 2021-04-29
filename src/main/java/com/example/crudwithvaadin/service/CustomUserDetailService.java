@@ -17,11 +17,11 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        final com.example.crudwithvaadin.model.User user = userRepository.findByUserName(username);
+        final com.example.crudwithvaadin.model.UserDetails userDetails = userRepository.findByUserName(username);
 
-        if (user == null) {
+        if (userDetails == null) {
             throw new UsernameNotFoundException(username);
         }
-        return User.withUsername(user.getUserName()).password(user.getPassword()).authorities(user.getRole().toString()).build();
+        return User.withUsername(userDetails.getUserName()).password(userDetails.getPassword()).authorities(userDetails.getRole().toString()).build();
     }
 }

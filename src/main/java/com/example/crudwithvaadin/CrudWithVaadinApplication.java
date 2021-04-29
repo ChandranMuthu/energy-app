@@ -2,7 +2,7 @@ package com.example.crudwithvaadin;
 
 import com.example.crudwithvaadin.model.EnergyOutput;
 import com.example.crudwithvaadin.model.Role;
-import com.example.crudwithvaadin.model.User;
+import com.example.crudwithvaadin.model.UserDetails;
 import com.example.crudwithvaadin.repository.EnergyOutputRepository;
 import com.example.crudwithvaadin.repository.UserRepository;
 import com.example.crudwithvaadin.service.UserService;
@@ -59,8 +59,8 @@ public class CrudWithVaadinApplication {
             repository.save(energyOutput51);
             log.info("Static energy data is loaded");
             userRepository.deleteAll();
-            User user = new User("Admin", "admin", "admin", "admin1234", "admin@gmail.com", Role.ADMIN);
-            userService.saveUser(user);
+            UserDetails userDetails = new UserDetails("Admin", "admin", "admin", "admin1234", "admin@gmail.com", Role.ADMIN);
+            userService.saveUser(userDetails);
             log.info("default admin user loaded");
         };
     }

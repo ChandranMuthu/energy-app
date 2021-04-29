@@ -4,6 +4,7 @@ import com.example.crudwithvaadin.model.EnergyOutput;
 import com.example.crudwithvaadin.model.Role;
 import com.example.crudwithvaadin.model.User;
 import com.example.crudwithvaadin.repository.EnergyOutputRepository;
+import com.example.crudwithvaadin.repository.UserRepository;
 import com.example.crudwithvaadin.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,7 +26,7 @@ public class CrudWithVaadinApplication {
     }
 
     @Bean
-    public CommandLineRunner loadData(EnergyOutputRepository repository, UserService userService) {
+    public CommandLineRunner loadData(EnergyOutputRepository repository, UserService userService, UserRepository userRepository) {
         return (args) -> {
             repository.deleteAll();
             EnergyOutput energyOutput = new EnergyOutput("1", "101", "1", LocalDateTime.now(), "ANC", "200", "12343", 50, "A", 2, "1", LocalDateTime.now(), "Chandran", "Chandran", LocalDateTime.now());
@@ -57,7 +58,7 @@ public class CrudWithVaadinApplication {
             repository.save(energyOutput5);
             repository.save(energyOutput51);
             log.info("Static energy data is loaded");
-            //userRepository.deleteAll();
+            userRepository.deleteAll();
             User user = new User("Admin", "admin", "admin", "admin1234", "admin@gmail.com", Role.ADMIN);
             userService.saveUser(user);
         };

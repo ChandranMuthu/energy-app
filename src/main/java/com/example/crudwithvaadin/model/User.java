@@ -9,12 +9,16 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
+import java.io.Serializable;
 import java.time.LocalDateTime;
 
 
 @Entity
-@Table(name = "User")
-public class User {
+@Table(name = "user_details")
+public class User implements Serializable {
+
+    private static final long serialVersionUID = 4686845785686592896L;
+
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")

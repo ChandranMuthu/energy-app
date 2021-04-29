@@ -4,10 +4,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.annotations.GenericGenerator;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.time.LocalDateTime;
@@ -37,6 +34,10 @@ public class UserDetails implements Serializable {
     private  Role role;
     private LocalDateTime createdAt;
 
+    @PrePersist
+    private void prePersist() {
+        createdAt = LocalDateTime.now();
+    }
 
     public UserDetails() {
     }
@@ -48,7 +49,6 @@ public class UserDetails implements Serializable {
         this.password = password;
         this.emailId = emailId;
         this.role = role;
-        this.createdAt = LocalDateTime.now();
     }
 
     public String getFirstName() {

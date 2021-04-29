@@ -15,7 +15,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "User")
 public class User {
-
     @Id
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
@@ -33,6 +32,7 @@ public class User {
     @NotNull
     private  Role role;
     private LocalDateTime createdAt;
+
 
     public User() {
     }
@@ -69,6 +69,10 @@ public class User {
 
     public String getUserName() {
         return userName;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     @Override

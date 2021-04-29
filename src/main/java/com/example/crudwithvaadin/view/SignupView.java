@@ -27,7 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 
-@Route("new-user")
+@Route(value = "new-user", layout = MainLayout.class)
 @PageTitle("Energy App - Sign up")
 public class SignupView extends VerticalLayout {
     private PasswordField passwordField1;
@@ -42,7 +42,7 @@ public class SignupView extends VerticalLayout {
 
     public SignupView(@Autowired UserService userService) {
         this.userService = userService;
-        H2 title = new H2("Signup form");
+        H2 title = new H2("Create New User");
         Span errorMessage = new Span();
         TextField firstName = new TextField("First name");
         firstName.setRequired(true);
@@ -64,14 +64,9 @@ public class SignupView extends VerticalLayout {
         emailField.setRequiredIndicatorVisible(true);
         emailField.setErrorMessage("Username cannot be empty");
 
-
         emailField.setVisible(true);
         passwordField1 = new PasswordField("Enter password");
         passwordField2 = new PasswordField("Confirm Password");
-
-
-
-
 
         Button submitButton = new Button("Submit");
         submitButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);

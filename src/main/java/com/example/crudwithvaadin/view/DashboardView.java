@@ -65,7 +65,7 @@ public class DashboardView extends VerticalLayout {
         // build layout
         HorizontalLayout actions = new HorizontalLayout(filter);
 
-        setupMenuBar();
+        //setupMenuBar();
 
 
         FormLayout nameLayout = new FormLayout();
@@ -87,6 +87,7 @@ public class DashboardView extends VerticalLayout {
             energyOutputList = repo.findAll();
             grid.setItems(energyOutputList);
             drawGraph(energyOutputList);
+            deviceIdComboBox.setValue("");
             chart.drawChart(true);
         });
 
@@ -142,34 +143,34 @@ public class DashboardView extends VerticalLayout {
         chart.drawChart(true);
     }
 
-    private void setupMenuBar() {
-        MenuBar menuBar = new MenuBar();
-        Text selected = new Text("");
-        Div message = new Div(new Text("Selected: "), selected);
-
-        MenuItem project = menuBar.addItem("Home");
-        MenuItem account = menuBar.addItem("Account");
-        menuBar.addItem("Sign Out", e -> selected.setText("Sign Out"));
-
-        SubMenu projectSubMenu = project.getSubMenu();
-        MenuItem users = projectSubMenu.addItem("Users");
-        MenuItem billing = projectSubMenu.addItem("Billing");
-
-        SubMenu usersSubMenu = users.getSubMenu();
-        usersSubMenu.addItem("List", e -> selected.setText("List"));
-        usersSubMenu.addItem("Add", e -> selected.setText("Add"));
-
-        SubMenu billingSubMenu = billing.getSubMenu();
-        billingSubMenu.addItem("Invoices", e -> selected.setText("Invoices"));
-        billingSubMenu.addItem("Balance Events",
-                e -> selected.setText("Balance Events"));
-
-        account.getSubMenu().addItem("Edit Profile",
-                e -> selected.setText("Edit Profile"));
-        account.getSubMenu().addItem("Privacy Settings",
-                e -> selected.setText("Privacy Settings"));
-        add(menuBar, message);
-    }
+//    private void setupMenuBar() {
+//        MenuBar menuBar = new MenuBar();
+//        Text selected = new Text("");
+//        Div message = new Div(new Text("Selected: "), selected);
+//
+//        MenuItem project = menuBar.addItem("Home");
+//        MenuItem account = menuBar.addItem("Account");
+//        menuBar.addItem("Sign Out", e -> selected.setText("Sign Out"));
+//
+//        SubMenu projectSubMenu = project.getSubMenu();
+//        MenuItem users = projectSubMenu.addItem("Users");
+//        MenuItem billing = projectSubMenu.addItem("Billing");
+//
+//        SubMenu usersSubMenu = users.getSubMenu();
+//        usersSubMenu.addItem("List", e -> selected.setText("List"));
+//        usersSubMenu.addItem("Add", e -> selected.setText("Add"));
+//
+//        SubMenu billingSubMenu = billing.getSubMenu();
+//        billingSubMenu.addItem("Invoices", e -> selected.setText("Invoices"));
+//        billingSubMenu.addItem("Balance Events",
+//                e -> selected.setText("Balance Events"));
+//
+//        account.getSubMenu().addItem("Edit Profile",
+//                e -> selected.setText("Edit Profile"));
+//        account.getSubMenu().addItem("Privacy Settings",
+//                e -> selected.setText("Privacy Settings"));
+//        add(menuBar, message);
+//    }
 
     private void drawGraph(final List<EnergyOutput> energyOutputList) {
 

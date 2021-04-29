@@ -1,6 +1,9 @@
 package com.example.crudwithvaadin.security;
 
+import com.example.crudwithvaadin.view.DashboardView;
 import com.example.crudwithvaadin.view.LoginView;
+import com.example.crudwithvaadin.view.SignupView;
+import com.example.crudwithvaadin.view.UsersView;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.server.ServiceInitEvent;
@@ -22,6 +25,14 @@ public class ConfigureUIServiceInitListener implements VaadinServiceInitListener
 		if (!LoginView.class.equals(event.getNavigationTarget())
 		    && !SecurityUtils.isUserLoggedIn()) { 
 			event.rerouteTo(LoginView.class);
+		}
+		if ((UsersView.class.equals(event.getNavigationTarget())
+				&& SecurityUtils.isUserLoggedIn()) && !SecurityUtils.isUserHasAdminRole()) {
+			event.rerouteTo(DashboardView.class);
+		}
+		if ((SignupView.class.equals(event.getNavigationTarget())
+				&& SecurityUtils.isUserLoggedIn()) && !SecurityUtils.isUserHasAdminRole()) {
+			event.rerouteTo(DashboardView.class);
 		}
 	}
 }

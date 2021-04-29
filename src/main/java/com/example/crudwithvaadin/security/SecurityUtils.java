@@ -28,4 +28,10 @@ public final class SecurityUtils {
             && !(authentication instanceof AnonymousAuthenticationToken)
             && authentication.isAuthenticated();
     }
+
+    public static boolean isUserHasAdminRole()
+    {
+        return SecurityContextHolder.getContext().getAuthentication().getAuthorities().stream()
+                .anyMatch(r -> r.getAuthority().equals("ADMIN"));
+    }
 }
